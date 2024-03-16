@@ -89,16 +89,8 @@ public class FtpServer {
      * @param filename String name of file to be downloaded
      * @param outputStream OutputStream
      */
-    public static void GET(String filename, DataOutputStream outputStream) {
-        try {
-            File file = new File(filename);
-            outputStream
-
-
-
-        } catch (IOException e) {
-            System.out.println("Error...");
-        }
+    public static void GET(String filename, DataOutputStream outputStream) throws IOException{
+        File file = new File(filename);
 
     }
 
