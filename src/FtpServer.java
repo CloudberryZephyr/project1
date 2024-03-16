@@ -49,7 +49,7 @@ public class FtpServer {
      *
      * @param command String containing keyword and possibly parameters from Client
      */
-    public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) {
+    public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
         Scanner commandParser = new Scanner(command);
 
         String keyword = commandParser.next();
@@ -59,13 +59,13 @@ public class FtpServer {
         }
         
         if (keyword == "LS") {
-            LS();
+            LS(outputStream);
         } else if (keyword == "PUT") {
             PUT(params.get(0), inputStream);
         } else if (keyword == "GET") {
             GET(params.get(0), outputStream);
         } else if (keyword == "PWD") {
-            PWD();
+            PWD(outputStream);
         } else {
 
         }
@@ -74,9 +74,13 @@ public class FtpServer {
     /**
      * Outputs the files in the current directory to the Client
      */
-    public static void LS(DataOutputStream outputStream) {
-        File[] files =
-
+    public static void LS(DataOutputStream outputStream) throws IOException{
+        File[] files = currentDirectory.toFile().listFiles();
+        outputStream.writeInt(files.length);
+        // output every file name in the array of files under the current directory
+        for (int i = 0; i < files.length; i++) {
+            outputStream.writeUTF(files[i].getName());
+        }
     }
 
     /**
