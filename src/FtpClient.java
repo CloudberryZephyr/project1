@@ -1,3 +1,10 @@
+/** Author:  Shannen Stolkovich and Clara Shoemaker
+ * Course:  COMP 342 Data Communications and Networking
+ * Date:    16 March 2022
+ * Description: Handles Client side of the FTP connection
+ */
+
+
 
 import java.io.FileWriter;
 import java.io.IOException;
