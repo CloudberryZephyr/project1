@@ -6,16 +6,13 @@
 
 
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 public class FtpClient {
    public static final int PORT = 9001;
@@ -39,9 +36,11 @@ public class FtpClient {
                 System.out.println("Command:");
 
                 String com = scan.next();
+                String filename = "";
 
                 for(int i = 0; i < com.length(); i++) {
                     command += com.charAt(i);
+
                 }
 
                 outputStream.writeUTF(command);
@@ -54,8 +53,11 @@ public class FtpClient {
                     }
                 } else if (command == "PWD") {
                     inputStream.readUTF();
-                }
+                } else if (command == "PUT") {
+                    System.out.println("File has been sent successfully.");
+                } else if (command == "GET") {
 
+                }
             }
         } catch(IOException e) {
             throw new IOException("Server Connection Error. Please try again later.");
