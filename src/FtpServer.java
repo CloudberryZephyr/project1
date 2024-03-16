@@ -12,7 +12,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FtpServer {
-    public static void main(String[] args) {
+    public static final int PORT = 9001;
 
+    public static void main(String[] args) {
+        try {
+            ServerSocket serverSocket = new ServerSocket(PORT);
+            Socket socket = serverSocket.accept();
+            System.out.println("Welcome to GCC FTP Service!\nWaiting for client commands...");
+
+
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 }
