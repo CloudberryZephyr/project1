@@ -15,6 +15,7 @@ import java.util.Scanner;
 
 public class FtpServer {
     public static final int PORT = 9001;
+    public static String currentDirectory;
 
     public static void main(String[] args) {
         try {
@@ -54,6 +55,48 @@ public class FtpServer {
         while (commandParser.hasNext()) {
             params.add(commandParser.next());
         }
+        
+        if (keyword == "LS") {
+            LS();
+        } else if (keyword == "PUT") {
+            PUT(params.get(0));
+        } else if (keyword == "GET") {
+            GET(params.get(0));
+        } else if (keyword == "PWD") {
+
+        } else {
+
+        }
+    }
+
+    /**
+     * Outputs the files in the current directory to the Client
+     */
+    public static void LS() {
+
+    }
+
+    /**
+     * Downloads the file specified by filename to client
+     *
+     * @param filename String name of file to be downloaded
+     */
+    public static void GET(String filename) {
+
+    }
+
+    /**
+     * Receives the file specified by filename from the client
+     */
+    public static void PUT(String filename) {
+
+    }
+
+    /**
+     * Lists the current directory, using path stored in currentDirectory
+     */
+    public static void PWD() {
+
     }
 
 }
