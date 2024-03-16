@@ -96,15 +96,15 @@ public class FtpServer {
     /**
      * Lists the current directory, using path stored in currentDirectory
      */
-    public static void PWD(File filename) {
-        Path path = filename.toPath().getParent();
+    public static void PWD() {
     }
 
     /**
      * Finds path to current directory and changes currentDirectory member variable
      */
     public static void updateCurrentDirectory() {
-
+        File filename = ;
+        Path path = filename.toPath().getParent().getParent();
     }
 
 }
