@@ -10,29 +10,30 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class FtpServer {
     public static final int PORT = 9001;
 
     public static void main(String[] args) {
         try {
+
+            // initialize socket
             ServerSocket serverSocket = new ServerSocket(PORT);
             Socket socket = serverSocket.accept();
             System.out.println("Welcome to GCC FTP Service!\nWaiting for client commands...");
 
-
+            // initialize input and output streams
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            String command = "";
-
-
             // While the client wants the connection to continue, parse the commands
+            String command = "";
             while (command != "QUIT") {
                 command = inputStream.readUTF();
 
                 parseCommand(command);
-
             }
 
         } catch (IOException e) {
@@ -46,7 +47,13 @@ public class FtpServer {
      * @param command String containing keyword and possibly parameters from Client
      */
     public static void parseCommand(String command) {
+        Scanner commandParser = new Scanner(command);
 
+        String keyword = commandParser.next();
+        ArrayList<String> params = new ArrayList<String>();
+        while (commandParser.hasNext()) {
+            params.add(commandParser.next());
+        }
     }
 
 }
