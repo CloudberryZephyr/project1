@@ -30,8 +30,12 @@ public class FtpClient {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            while (true) {
+            String command = "";
+
+            while (command != "quit") {
                 System.out.println("Command:");
+
+                command = inputStream.readUTF();
             }
         } catch(IOException e) {
             throw new IOException("Server Connection Error. Please try again later.");
