@@ -73,6 +73,7 @@ public class FtpServer {
      * Outputs the files in the current directory to the Client
      */
     public static void LS() {
+        File[] files =
 
     }
 
@@ -96,6 +97,13 @@ public class FtpServer {
      * Lists the current directory, using path stored in currentDirectory
      */
     public static void PWD() {
+
+    }
+
+    /**
+     * Finds path to current directory and changes currentDirectory member variable
+     */
+    public static void updateCurrentDirectory() {
 
     }
 
