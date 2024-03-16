@@ -46,13 +46,14 @@ public class FtpClient {
 
                 outputStream.writeUTF(command);
 
-                if (command == "PWD") {
+                if (command == "LS") {
+                    int length = inputStream.readInt();
 
-                } else if (command == "LS") {
-
-                } else {
-
+                    for (int i = 0; i < length; i++) {
+                        System.out.println(inputStream.readUTF());
+                    }
                 }
+
             }
         } catch(IOException e) {
             throw new IOException("Server Connection Error. Please try again later.");
