@@ -35,7 +35,7 @@ public class FtpClient {
 
             String command = "";
 
-            while (command != "QUIT") {
+            while (inputStream.readUTF() != "QUIT") {
                 System.out.println("Command:");
 
                 String com = scan.next();
