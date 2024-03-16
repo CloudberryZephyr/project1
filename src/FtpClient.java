@@ -1,6 +1,6 @@
 /** Author:  Shannen Stolkovich and Clara Shoemaker
  * Course:  COMP 342 Data Communications and Networking
- * Date:    16 March 2022
+ * Date:    16 March 2024
  * Description: Handles Client side of the FTP connection
  */
 
@@ -21,5 +21,20 @@ public class FtpClient {
    public static final int PORT = 9001;
    public static final String HOST = "127.0.0.1";
 
+    public static void main(String[] args) throws IOException {
+        System.out.println("Welcome to the GCC FTP client service!");
 
+        try {
+            Socket socket = new Socket(HOST, PORT);
+            System.out.println("Succeed: socket: " + socket);
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+            while (true) {
+                System.out.println("Command:");
+            }
+        } catch(IOException e) {
+            throw new IOException("Server Connection Error. Please try again later.");
+        }
+    }
 }
