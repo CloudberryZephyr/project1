@@ -24,10 +24,29 @@ public class FtpServer {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
+            String command = "";
+
+
+            // While the client wants the connection to continue, parse the commands
+            while (command != "QUIT") {
+                command = inputStream.readUTF();
+
+                parseCommand(command);
+
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Parses command string to run client's desired command
+     *
+     * @param command String containing keyword and possibly parameters from Client
+     */
+    public static void parseCommand(String command) {
+
     }
 
 }
