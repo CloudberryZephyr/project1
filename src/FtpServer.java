@@ -49,7 +49,7 @@ public class FtpServer {
      *
      * @param command String containing keyword and possibly parameters from Client
      */
-    public static void parseCommand(String command, InputStream inputStream, OutputStream outputStream) {
+    public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) {
         Scanner commandParser = new Scanner(command);
 
         String keyword = commandParser.next();
@@ -74,7 +74,7 @@ public class FtpServer {
     /**
      * Outputs the files in the current directory to the Client
      */
-    public static void LS() {
+    public static void LS(DataOutputStream outputStream) {
         File[] files =
 
     }
@@ -85,7 +85,7 @@ public class FtpServer {
      * @param filename String name of file to be downloaded
      * @param outputStream OutputStream
      */
-    public static void GET(String filename, OutputStream outputStream) {
+    public static void GET(String filename, DataOutputStream outputStream) {
         try {
             File file = new File(filename);
             outputStream
@@ -101,14 +101,15 @@ public class FtpServer {
     /**
      * Receives the file specified by filename from the client
      */
-    public static void PUT(String filename, InputStream inputStream) {
+    public static void PUT(String filename, DataInputStream inputStream) {
 
     }
 
     /**
      * Lists the current directory, using path stored in currentDirectory
      */
-    public static void PWD() {
+    public static void PWD(DataOutputStream outputStream) throws IOException {
+        outputStream.writeChars(currentDirectory.toString());
     }
 
     /**
