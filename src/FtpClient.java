@@ -11,5 +11,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
 public class FtpClient {
-   
+   public static final int PORT = 9001;
+   public static final String HOST = "127.0.0.1";
+
+
 }
