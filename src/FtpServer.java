@@ -112,8 +112,7 @@ public class FtpServer {
      * Finds path to current directory and changes currentDirectory member variable
      */
     public static Path getCurrentDirectory() {
-        File filename = new File("FtpServer.java");
-        Path path = filename.toPath().getParent().getParent();
+        Path path = Path.of("").toAbsolutePath();
         return path;
     }
 
