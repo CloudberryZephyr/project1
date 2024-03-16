@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class FtpServer {
     public static final int PORT = 9001;
-    public static String currentDirectory;
+    public static Path currentDirectory;
 
     public static void main(String[] args) {
         try {
@@ -29,12 +29,14 @@ public class FtpServer {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
+            currentDirectory = getCurrentDirectory();
+
             // While the client wants the connection to continue, parse the commands
             String command = "";
             while (command != "QUIT") {
                 command = inputStream.readUTF();
 
-                parseCommand(command);
+                parseCommand(command, inputStream, outputStream);
             }
 
         } catch (IOException e) {
@@ -47,7 +49,7 @@ public class FtpServer {
      *
      * @param command String containing keyword and possibly parameters from Client
      */
-    public static void parseCommand(String command) {
+    public static void parseCommand(String command, InputStream inputStream, OutputStream outputStream) {
         Scanner commandParser = new Scanner(command);
 
         String keyword = commandParser.next();
@@ -59,9 +61,9 @@ public class FtpServer {
         if (keyword == "LS") {
             LS();
         } else if (keyword == "PUT") {
-            PUT(params.get(0));
+            PUT(params.get(0), inputStream);
         } else if (keyword == "GET") {
-            GET(params.get(0));
+            GET(params.get(0), outputStream);
         } else if (keyword == "PWD") {
             PWD();
         } else {
@@ -81,15 +83,25 @@ public class FtpServer {
      * Downloads the file specified by filename to client
      *
      * @param filename String name of file to be downloaded
+     * @param outputStream OutputStream
      */
-    public static void GET(String filename) {
+    public static void GET(String filename, OutputStream outputStream) {
+        try {
+            File file = new File(filename);
+            outputStream
+
+
+
+        } catch (IOException e) {
+            System.out.println("Error...");
+        }
 
     }
 
     /**
      * Receives the file specified by filename from the client
      */
-    public static void PUT(String filename) {
+    public static void PUT(String filename, InputStream inputStream) {
 
     }
 
@@ -102,9 +114,10 @@ public class FtpServer {
     /**
      * Finds path to current directory and changes currentDirectory member variable
      */
-    public static void updateCurrentDirectory() {
-        File filename = ;
+    public static Path getCurrentDirectory() {
+        File filename = new File("FtpServer.java");
         Path path = filename.toPath().getParent().getParent();
+        return path;
     }
 
 }
