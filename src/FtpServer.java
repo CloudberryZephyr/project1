@@ -63,7 +63,7 @@ public class FtpServer {
         } else if (keyword == "GET") {
             GET(params.get(0));
         } else if (keyword == "PWD") {
-
+            PWD();
         } else {
 
         }
