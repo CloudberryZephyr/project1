@@ -52,6 +52,8 @@ public class FtpClient {
                     for (int i = 0; i < length; i++) {
                         System.out.println(inputStream.readUTF());
                     }
+                } else if (command == "PWD") {
+                    inputStream.readUTF();
                 }
 
             }
