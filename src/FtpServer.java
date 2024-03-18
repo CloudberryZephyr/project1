@@ -33,7 +33,7 @@ public class FtpServer {
 
             // While the client wants the connection to continue, parse the commands
             String command = "";
-            while (command != "QUIT") {
+            while (true) {
                 command = inputStream.readUTF();
 
                 parseCommand(command, inputStream, outputStream);
@@ -57,17 +57,17 @@ public class FtpServer {
         while (commandParser.hasNext()) {
             params.add(commandParser.next());
         }
-        
-        if (keyword == "LS") {
-            LS(outputStream);
-        } else if (keyword == "PUT") {
-            PUT(params.get(0), inputStream);
-        } else if (keyword == "GET") {
-            GET(params.get(0), outputStream);
-        } else if (keyword == "PWD") {
-            PWD(outputStream);
-        } else {
 
+        if (keyword.equals("LS")) {
+            LS(outputStream);
+        } else if (keyword.equals("PUT")) {
+            PUT(params.get(0), inputStream);
+        } else if (keyword.equals("GET")) {
+            GET(params.get(0), outputStream);
+        } else if (keyword.equals("PWD")) {
+            PWD(outputStream);
+        } else if (keyword.equals("QUIT")){
+            System.exit(0);
         }
     }
 
@@ -105,7 +105,7 @@ public class FtpServer {
      * Lists the current directory, using path stored in currentDirectory
      */
     public static void PWD(DataOutputStream outputStream) throws IOException {
-        outputStream.writeChars(currentDirectory.toString());
+        outputStream.writeUTF(currentDirectory.toString());
     }
 
     /**

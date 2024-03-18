@@ -32,31 +32,28 @@ public class FtpClient {
 
             String command = "";
 
-            while (command != "QUIT") {
+            while (true) {
                 System.out.println("Command:");
 
-                String com = scan.next();
+                command = scan.next();
                 String filename = "";
-
-                for(int i = 0; i < com.length(); i++) {
-                    command += com.charAt(i);
-
-                }
 
                 outputStream.writeUTF(command);
 
-                if (command == "LS") {
+                if (command.equals("LS")) {
                     int length = inputStream.readInt();
-
+                    System.out.println(length);
                     for (int i = 0; i < length; i++) {
                         System.out.println(inputStream.readUTF());
                     }
-                } else if (command == "PWD") {
-                    inputStream.readUTF();
-                } else if (command == "PUT") {
+                } else if (command.equals("PWD")) {
+                    System.out.println(inputStream.readUTF());
+                } else if (command.equals("PUT")) {
                     System.out.println("File has been sent successfully.");
-                } else if (command == "GET") {
+                } else if (command.equals("GET")) {
 
+                } else if (command.equals("QUIT")) {
+                    break;
                 }
             }
         } catch(IOException e) {
