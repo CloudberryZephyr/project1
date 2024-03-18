@@ -9,8 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -161,6 +159,7 @@ public class FtpServer {
         byte[] imgArray = byteArrayOutputStream.toByteArray();
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
+        outputStream.flush();
 
         byteArrayOutputStream.close();
     }
@@ -198,6 +197,7 @@ public class FtpServer {
         for (int i = 0; i < fileArray.size(); i++) {
             outputStream.writeUTF(fileArray.get(i));
         }
+        outputStream.flush();
 
         scan.close();
     }

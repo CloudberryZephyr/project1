@@ -10,10 +10,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -33,10 +31,12 @@ public class FtpClient {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            while (true) {
+            String keyword = "";
+
+            while (!keyword.equals("QUIT")) {
                 System.out.println("Command:");
 
-                String keyword = scan.nextLine();
+                keyword = scan.nextLine();
 
                 ArrayList<String> params = new ArrayList<String>();
                 Scanner scanner = new Scanner(keyword);
@@ -61,8 +61,6 @@ public class FtpClient {
                 } else if (command.equals("PWD")) {
                     System.out.println(inputStream.readUTF());
 
-                }  else if (command.equals("QUIT")) {
-                    break;
                 } else if (command.equals("GET")) {
 
                     String filename = inputStream.readUTF();
@@ -85,8 +83,10 @@ public class FtpClient {
                             writer.write(inputStream.readUTF());
                         }
                     }
+                    writer.flush();
 
                     writer.close();
+
                 } else if (command.equals("PUT")) {
                     String filename = params.get(1);
                     outputStream.writeUTF(filename);
@@ -98,12 +98,19 @@ public class FtpClient {
                         transmitTXT(filename, outputStream);
                     }
                 }
-            }
+                // end of if block
+
+            } // end of while loop
+
+            // close everything
+            outputStream.close();
+            inputStream.close();
+            socket.close();
+
         } catch(IOException e) {
             throw new IOException("Server Connection Error. Please try again later.");
         }
     }
-
 
     /**
      * Transmits a file of type .png to client
@@ -111,7 +118,7 @@ public class FtpClient {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(filename);
+        File file = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -119,10 +126,10 @@ public class FtpClient {
         byte[] imgArray = byteArrayOutputStream.toByteArray();
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
+        outputStream.flush();
 
         byteArrayOutputStream.close();
     }
-
 
     /**
      * Transmits a file of type .txt to client
@@ -130,13 +137,25 @@ public class FtpClient {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(filename);
-        Scanner fileSc = new Scanner(file);
+
+        File[] files = Path.of("client_folder").toAbsolutePath().toFile().listFiles();
+
+        File copy = new File(filename);
+
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].getName().equals(filename)) {
+                copy = files[i];
+            }
+        }
+
+        FileInputStream input = new FileInputStream(copy);
+
+        Scanner scan = new Scanner(input);
 
         ArrayList<String> fileArray = new ArrayList<String>();
         // add contents of file to ArrayList
-        while (fileSc.hasNext()) {
-            fileArray.add(fileSc.next());
+        while (scan.hasNext()) {
+            fileArray.add(scan.nextLine());
         }
 
         // send number of messages to expect
@@ -146,7 +165,9 @@ public class FtpClient {
         for (int i = 0; i < fileArray.size(); i++) {
             outputStream.writeUTF(fileArray.get(i));
         }
+        outputStream.flush();
 
-        fileSc.close();
+        scan.close();
     }
+
 }
