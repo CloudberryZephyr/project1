@@ -49,7 +49,7 @@ public class FtpServer {
      * Finds path to current directory and changes currentDirectory member variable
      */
     public static Path getCurrentDirectory() {
-        Path path = Path.of("server_folder");
+        Path path = Path.of("server_folder").toAbsolutePath();
         return path;
     }
 
@@ -153,8 +153,7 @@ public class FtpServer {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
-        System.out.println(currentDirectory + File.separator + filename);
-        File file = new File(currentDirectory + filename);
+        File file = new File(currentDirectory + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -172,14 +171,24 @@ public class FtpServer {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
-        System.out.println(currentDirectory + File.separator + filename);
-        File file = new File(currentDirectory + filename);
-        Scanner fileSc = new Scanner(file);
+        File[] files = currentDirectory.toFile().listFiles();
+
+        File copy = new File(filename);
+
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].getName().equals(filename)) {
+                 copy = files[i];
+            }
+        }
+
+        FileInputStream input = new FileInputStream(copy);
+
+        Scanner scan = new Scanner(input);
 
         ArrayList<String> fileArray = new ArrayList<String>();
         // add contents of file to ArrayList
-        while (fileSc.hasNext()) {
-            fileArray.add(fileSc.next());
+        while (scan.hasNext()) {
+            fileArray.add(scan.nextLine());
         }
 
         // send number of messages to expect
@@ -190,7 +199,7 @@ public class FtpServer {
             outputStream.writeUTF(fileArray.get(i));
         }
 
-        fileSc.close();
+        scan.close();
     }
 
 }

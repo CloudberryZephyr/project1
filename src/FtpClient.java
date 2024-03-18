@@ -38,8 +38,6 @@ public class FtpClient {
 
                 String keyword = scan.nextLine();
 
-                System.out.println(keyword);
-
                 ArrayList<String> params = new ArrayList<String>();
                 Scanner scanner = new Scanner(keyword);
                 scanner.useDelimiter(" ");
@@ -54,7 +52,6 @@ public class FtpClient {
 
                 if (command.equals("LS")) {
                     int length = inputStream.readInt();
-                    System.out.println(length);
                     String list = "";
                     for (int i = 0; i < length; i++) {
                         list += inputStream.readUTF() + "\n";
