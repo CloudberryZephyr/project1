@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class FtpClient {
@@ -30,15 +31,22 @@ public class FtpClient {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            String command = "";
-
             while (true) {
                 System.out.println("Command:");
 
-                command = scan.next();
-                String filename = "";
+                String keyword = scan.next();
 
-                outputStream.writeUTF(command);
+                ArrayList<String> params = new ArrayList<String>();
+                Scanner scanner = new Scanner(keyword);
+                scanner.useDelimiter(" ");
+
+                while (scanner.hasNext()) {
+                    params.add(scanner.next());
+                }
+                outputStream.writeUTF(keyword);
+
+                String command = params.get(0);
+
 
                 if (command.equals("LS")) {
                     int length = inputStream.readInt();
@@ -48,12 +56,11 @@ public class FtpClient {
                     }
                 } else if (command.equals("PWD")) {
                     System.out.println(inputStream.readUTF());
-                } else if (command.equals("PUT")) {
-                    System.out.println("File has been sent successfully.");
+
+                }  else if (command.equals("QUIT")) {
+                    break;
                 } else if (command.equals("GET")) {
 
-                } else if (command.equals("QUIT")) {
-                    break;
                 }
             }
         } catch(IOException e) {

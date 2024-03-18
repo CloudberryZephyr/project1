@@ -52,18 +52,21 @@ public class FtpServer {
     public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
         Scanner commandParser = new Scanner(command);
 
-        String keyword = commandParser.next();
         ArrayList<String> params = new ArrayList<String>();
+        commandParser.useDelimiter(" ");
+
         while (commandParser.hasNext()) {
             params.add(commandParser.next());
         }
 
+        String keyword = params.get(0);
+
         if (keyword.equals("LS")) {
             LS(outputStream);
         } else if (keyword.equals("PUT")) {
-            PUT(params.get(0), inputStream);
+            PUT(params.get(1), inputStream);
         } else if (keyword.equals("GET")) {
-            GET(params.get(0), outputStream);
+            GET(params.get(1), outputStream);
         } else if (keyword.equals("PWD")) {
             PWD(outputStream);
         } else if (keyword.equals("QUIT")){
@@ -76,7 +79,6 @@ public class FtpServer {
      */
     public static void LS(DataOutputStream outputStream) throws IOException{
         File[] files = currentDirectory.toFile().listFiles();
-        outputStream.writeInt(files.length);
         // output every file name in the array of files under the current directory
         for (int i = 0; i < files.length; i++) {
             outputStream.writeUTF(files[i].getName());
@@ -90,8 +92,7 @@ public class FtpServer {
      * @param outputStream OutputStream
      */
     public static void GET(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(filename);
-
+       outputStream.writeUTF(filename);
     }
 
     /**
@@ -115,5 +116,6 @@ public class FtpServer {
         Path path = Path.of("fileSystem").toAbsolutePath();
         return path;
     }
+
 
 }
