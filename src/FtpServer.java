@@ -96,7 +96,11 @@ public class FtpServer {
     public static void GET(String filename, DataOutputStream outputStream) throws IOException{
        outputStream.writeUTF(filename);
         if (filename.endsWith(".png")) {
+            // transmit .png file
             transmitPNG(filename, outputStream);
+        } else {
+            // transmit .txt file
+            transmitTXT(filename, outputStream);
         }
     }
 
@@ -134,8 +138,35 @@ public class FtpServer {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOutputStream);
-        outputStream.write(byteArrayOutputStream.toByteArray());
+        byte[] imgArray = byteArrayOutputStream.toByteArray();
+        outputStream.writeInt(imgArray.length);
+        outputStream.write(imgArray);
+    }
 
+    /**
+     * Transmits a file of type .txt to client
+     *
+     * @param filename the name of the png file to be transmitted
+     */
+    public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
+        File file = new File(filename);
+        Scanner fileSc = new Scanner(file);
+
+        ArrayList<String> fileArray = new ArrayList<String>();
+        // add contents of file to ArrayList
+        while (fileSc.hasNext()) {
+            fileArray.add(fileSc.next());
+        }
+
+        // send number of messages to expect
+        outputStream.writeInt(fileArray.size());
+
+        // send messages
+        for (int i = 0; i < fileArray.size(); i++) {
+            outputStream.writeUTF(fileArray.get(i));
+        }
+
+        fileSc.close();
     }
 
 }

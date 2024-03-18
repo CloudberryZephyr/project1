@@ -63,6 +63,12 @@ public class FtpClient {
                     String filename = inputStream.readUTF();
                     File f = new File(filename);
                     FileWriter writer= new FileWriter(f);
+                    if (filename.endsWith(".png")) {
+                        // receive .png file
+                    } else {
+                        // receive .txt file
+                        while ()
+                    }
                     int length = inputStream.readInt();
 
                     for(int i = 0; i < length; i++) {
