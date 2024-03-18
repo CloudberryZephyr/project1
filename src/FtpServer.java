@@ -115,7 +115,7 @@ public class FtpServer {
      */
     public static void PUT(String filename, DataInputStream inputStream) throws IOException {
         filename = inputStream.readUTF();
-        File f = new File(filename);
+        File f = new File(Path.of("server_folder").toAbsolutePath() + File.separator + filename);
         FileWriter writer= new FileWriter(f);
 
         int length = inputStream.readInt();
