@@ -37,13 +37,20 @@ public class FtpServer {
             String command = "";
             while (true) {
                 command = inputStream.readUTF();
-                System.out.println(command);
                 parseCommand(command, inputStream, outputStream);
             }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Finds path to current directory and changes currentDirectory member variable
+     */
+    public static Path getCurrentDirectory() {
+        Path path = Path.of("server_folder");
+        return path;
     }
 
     /**
@@ -81,6 +88,8 @@ public class FtpServer {
      */
     public static void LS(DataOutputStream outputStream) throws IOException{
         File[] files = currentDirectory.toFile().listFiles();
+
+        outputStream.writeInt(files.length);
         // output every file name in the array of files under the current directory
         for (int i = 0; i < files.length; i++) {
             outputStream.writeUTF(files[i].getName());
@@ -117,15 +126,6 @@ public class FtpServer {
     public static void PWD(DataOutputStream outputStream) throws IOException {
         outputStream.writeUTF(currentDirectory.toString());
     }
-
-    /**
-     * Finds path to current directory and changes currentDirectory member variable
-     */
-    public static Path getCurrentDirectory() {
-        Path path = Path.of("fileSystem").toAbsolutePath();
-        return path;
-    }
-
 
     /**
      * Transmits a file of type .png to client

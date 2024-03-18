@@ -53,9 +53,12 @@ public class FtpClient {
                 if (command.equals("LS")) {
                     int length = inputStream.readInt();
                     System.out.println(length);
+                    String list = "";
                     for (int i = 0; i < length; i++) {
-                        System.out.println(inputStream.readUTF());
+                        list += inputStream.readUTF() + "\n";
                     }
+                    System.out.println(list);
+
                 } else if (command.equals("PWD")) {
                     System.out.println(inputStream.readUTF());
 
