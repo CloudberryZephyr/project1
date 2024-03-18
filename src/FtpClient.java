@@ -36,7 +36,9 @@ public class FtpClient {
             while (true) {
                 System.out.println("Command:");
 
-                String keyword = scan.next();
+                String keyword = scan.nextLine();
+
+                System.out.println(keyword);
 
                 ArrayList<String> params = new ArrayList<String>();
                 Scanner scanner = new Scanner(keyword);

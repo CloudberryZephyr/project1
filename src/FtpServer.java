@@ -60,7 +60,6 @@ public class FtpServer {
      */
     public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
         Scanner commandParser = new Scanner(command);
-
         ArrayList<String> params = new ArrayList<String>();
         commandParser.useDelimiter(" ");
 
