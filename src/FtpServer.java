@@ -116,8 +116,29 @@ public class FtpServer {
     /**
      * Receives the file specified by filename from the client
      */
-    public static void PUT(String filename, DataInputStream inputStream) {
+    public static void PUT(String filename, DataInputStream inputStream) throws IOException {
+        filename = inputStream.readUTF();
+        File f = new File(filename);
+        FileWriter writer= new FileWriter(f);
 
+        int length = inputStream.readInt();
+
+        // process is different depending on file type
+        if (filename.endsWith(".png")) {
+            // receive .png file
+            byte[] imageAr = new byte[length];
+            inputStream.read(imageAr);
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+            ImageIO.write(image, "png", f);
+
+        } else {
+            // receive .txt file
+            for(int i = 0; i < length; i++) {
+                writer.write(inputStream.readUTF());
+            }
+        }
+
+        writer.close();
     }
 
     /**
