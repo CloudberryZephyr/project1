@@ -4,6 +4,8 @@
  * Description: Handles Server side of the FTP connection
  */
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,7 +37,7 @@ public class FtpServer {
             String command = "";
             while (true) {
                 command = inputStream.readUTF();
-
+                System.out.println(command);
                 parseCommand(command, inputStream, outputStream);
             }
 
@@ -93,7 +95,9 @@ public class FtpServer {
      */
     public static void GET(String filename, DataOutputStream outputStream) throws IOException{
        outputStream.writeUTF(filename);
-
+        if (filename.endsWith(".png")) {
+            transmitPNG(filename, outputStream);
+        }
     }
 
     /**
@@ -118,5 +122,20 @@ public class FtpServer {
         return path;
     }
 
+
+    /**
+     * Transmits a file of type .png to client
+     *
+     * @param filename the name of the png file to be transmitted
+     */
+    public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
+        File file = new File(filename);
+        BufferedImage image = ImageIO.read(file);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", byteArrayOutputStream);
+        outputStream.write(byteArrayOutputStream.toByteArray());
+
+    }
 
 }
