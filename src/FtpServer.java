@@ -153,7 +153,8 @@ public class FtpServer {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(filename);
+        System.out.println(currentDirectory+filename);
+        File file = new File(currentDirectory + filename);
         BufferedImage image = ImageIO.read(file);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -171,7 +172,8 @@ public class FtpServer {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(filename);
+        System.out.println(currentDirectory+filename);
+        File file = new File(currentDirectory + filename);
         Scanner fileSc = new Scanner(file);
 
         ArrayList<String> fileArray = new ArrayList<String>();
