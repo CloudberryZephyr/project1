@@ -60,7 +60,16 @@ public class FtpClient {
                 }  else if (command.equals("QUIT")) {
                     break;
                 } else if (command.equals("GET")) {
+                    String filename = inputStream.readUTF();
+                    File f = new File(filename);
+                    FileWriter writer= new FileWriter(f);
+                    int length = inputStream.readInt();
 
+                    for(int i = 0; i < length; i++) {
+                        writer.write(inputStream.readUTF());
+                    }
+
+                    writer.close();
                 }
             }
         } catch(IOException e) {

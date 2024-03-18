@@ -93,6 +93,7 @@ public class FtpServer {
      */
     public static void GET(String filename, DataOutputStream outputStream) throws IOException{
        outputStream.writeUTF(filename);
+
     }
 
     /**
