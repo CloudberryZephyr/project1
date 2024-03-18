@@ -134,6 +134,8 @@ public class FtpServer {
                 writer.write(inputStream.readUTF());
             }
         }
+        writer.flush();
+
 
         writer.close();
     }

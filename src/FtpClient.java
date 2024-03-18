@@ -90,6 +90,7 @@ public class FtpClient {
                 } else if (command.equals("PUT")) {
                     String filename = params.get(1);
                     outputStream.writeUTF(filename);
+
                     if (filename.endsWith(".png")) {
                         // transmit .png file
                         transmitPNG(filename, outputStream);
@@ -118,7 +119,7 @@ public class FtpClient {
      * @param filename the name of the png file to be transmitted
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
-        File file = new File(Path.of("server_folder").toAbsolutePath() + File.separator + filename);
+        File file = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -138,7 +139,7 @@ public class FtpClient {
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
 
-        File[] files = Path.of("server_folder").toAbsolutePath().toFile().listFiles();
+        File[] files = Path.of("client_folder").toAbsolutePath().toFile().listFiles();
 
         File copy = new File(filename);
 
