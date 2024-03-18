@@ -6,6 +6,8 @@
 
 
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -60,26 +62,89 @@ public class FtpClient {
                 }  else if (command.equals("QUIT")) {
                     break;
                 } else if (command.equals("GET")) {
+
                     String filename = inputStream.readUTF();
                     File f = new File(filename);
                     FileWriter writer= new FileWriter(f);
-                    if (filename.endsWith(".png")) {
-                        // receive .png file
-                    } else {
-                        // receive .txt file
-                        while ()
-                    }
+
                     int length = inputStream.readInt();
 
-                    for(int i = 0; i < length; i++) {
-                        writer.write(inputStream.readUTF());
+                    // process is different depending on file type
+                    if (filename.endsWith(".png")) {
+                        // receive .png file
+                        byte[] imageAr = new byte[length];
+                        inputStream.read(imageAr);
+                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                        ImageIO.write(image, "png", f);
+
+                    } else {
+                        // receive .txt file
+                        for(int i = 0; i < length; i++) {
+                            writer.write(inputStream.readUTF());
+                        }
                     }
 
                     writer.close();
+                } else if (command.equals("PUT")) {
+                    String filename = params.get(1);
+                    outputStream.writeUTF(filename);
+                    if (filename.endsWith(".png")) {
+                        // transmit .png file
+                        transmitPNG(filename, outputStream);
+                    } else {
+                        // transmit .txt file
+                        transmitTXT(filename, outputStream);
+                    }
                 }
             }
         } catch(IOException e) {
             throw new IOException("Server Connection Error. Please try again later.");
         }
+    }
+
+
+    /**
+     * Transmits a file of type .png to client
+     *
+     * @param filename the name of the png file to be transmitted
+     */
+    public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
+        File file = new File(filename);
+        BufferedImage image = ImageIO.read(file);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(image, "png", byteArrayOutputStream);
+        byte[] imgArray = byteArrayOutputStream.toByteArray();
+        outputStream.writeInt(imgArray.length);
+        outputStream.write(imgArray);
+
+        byteArrayOutputStream.close();
+    }
+
+
+    /**
+     * Transmits a file of type .txt to client
+     *
+     * @param filename the name of the png file to be transmitted
+     */
+    public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
+        File file = new File(filename);
+        Scanner fileSc = new Scanner(file);
+
+        ArrayList<String> fileArray = new ArrayList<String>();
+        // add contents of file to ArrayList
+        while (fileSc.hasNext()) {
+            fileArray.add(fileSc.next());
+        }
+
+        // send number of messages to expect
+        outputStream.writeInt(fileArray.size());
+
+        // send messages
+        for (int i = 0; i < fileArray.size(); i++) {
+            outputStream.writeUTF(fileArray.get(i));
+        }
+
+        fileSc.close();
     }
 }

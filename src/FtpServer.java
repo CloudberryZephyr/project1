@@ -141,6 +141,8 @@ public class FtpServer {
         byte[] imgArray = byteArrayOutputStream.toByteArray();
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
+
+        byteArrayOutputStream.close();
     }
 
     /**
