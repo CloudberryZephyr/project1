@@ -26,80 +26,60 @@ public class FtpClient {
         System.out.println("Welcome to the GCC FTP client service!");
 
         try {
+            // initialize socket and io objects
             Socket socket = new Socket(HOST, PORT);
             System.out.println("Succeed: socket: " + socket);
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
+            // continues receiving commands until the client quits
             String keyword = "";
-
             while (!keyword.equals("QUIT")) {
+
+                // prompt and receive, and parse commands
                 System.out.println("Command:");
-
                 keyword = scan.nextLine();
-
                 ArrayList<String> params = new ArrayList<String>();
                 Scanner scanner = new Scanner(keyword);
                 scanner.useDelimiter(" ");
-
                 while (scanner.hasNext()) {
                     params.add(scanner.next());
                 }
+
+                // send command to server
                 outputStream.writeUTF(keyword);
 
                 String command = params.get(0);
 
-
-                if (command.equals("LS")) {
-                    int length = inputStream.readInt();
-                    String list = "";
-                    for (int i = 0; i < length; i++) {
-                        list += inputStream.readUTF() + "\n";
-                    }
-                    System.out.println(list);
-
-                } else if (command.equals("PWD")) {
-                    System.out.println(inputStream.readUTF());
-
-                } else if (command.equals("GET")) {
-
-                    String filename = inputStream.readUTF();
-                    File f = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
-                    FileWriter writer= new FileWriter(f);
-
-                    int length = inputStream.readInt();
-
-                    // process is different depending on file type
-                    if (filename.endsWith(".png")) {
-                        // receive .png file
-                        byte[] imageAr = new byte[length];
-                        inputStream.read(imageAr);
-                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        ImageIO.write(image, "png", f);
-
-                    } else {
-                        // receive .txt file
-                        for(int i = 0; i < length; i++) {
-                            writer.write(inputStream.readUTF());
+                // Switch block depending on command
+                switch (command) {
+                    case "LS" :
+                        int length = inputStream.readInt();
+                        String list = "";
+                        for (int i = 0; i < length; i++) {
+                            list += inputStream.readUTF() + "\n";
                         }
-                    }
-                    writer.flush();
+                        System.out.println(list);
 
-                    writer.close();
+                    case "PWD" :
+                        System.out.println(inputStream.readUTF());
 
-                } else if (command.equals("PUT")) {
-                    String filename = params.get(1);
-                    outputStream.writeUTF(filename);
+                    case "GET" :
+                        GET(params.get(1), inputStream);
 
-                    if (filename.endsWith(".png")) {
-                        // transmit .png file
-                        transmitPNG(filename, outputStream);
-                    } else {
-                        // transmit .txt file
-                        transmitTXT(filename, outputStream);
-                    }
-                }
-                // end of if block
+                    case "PUT" :
+                        String filename = params.get(1);
+                        outputStream.writeUTF(filename);
+
+                        if (filename.endsWith(".png")) {
+                            // transmit .png file
+                            transmitPNG(filename, outputStream);
+                        } else {
+                            // transmit .txt file
+                            transmitTXT(filename, outputStream);
+                        }
+
+                } // end of switch block
 
             } // end of while loop
 
@@ -114,17 +94,23 @@ public class FtpClient {
     }
 
     /**
-     * Transmits a file of type .png to client
+     * Sends files of type .png to the server
      *
-     * @param filename the name of the png file to be transmitted
+     * @param filename String name of the file to send
+     * @param outputStream DataOutputStream for socket output
+     * @throws IOException
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
+        // find file to transmit in client_folder
         File file = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
 
+        // write .png file to byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOutputStream);
         byte[] imgArray = byteArrayOutputStream.toByteArray();
+
+        // output byte array to client
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
         outputStream.flush();
@@ -133,28 +119,29 @@ public class FtpClient {
     }
 
     /**
-     * Transmits a file of type .txt to client
+     * Sends files of type .txt to the server
      *
-     * @param filename the name of the png file to be transmitted
+     * @param filename String name of file to send
+     * @param outputStream DataOutputStream for socket output
+     * @throws IOException
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
 
+        // find file in client_folder
         File[] files = Path.of("client_folder").toAbsolutePath().toFile().listFiles();
 
+        // make a copy of the .txt file to be sent
         File copy = new File(filename);
-
         for (int i = 0; i < files.length; i++) {
             if (files[i].getName().equals(filename)) {
                 copy = files[i];
             }
         }
 
+        // scan through entire copy, copy data to String array
         FileInputStream input = new FileInputStream(copy);
-
         Scanner scan = new Scanner(input);
-
         ArrayList<String> fileArray = new ArrayList<String>();
-        // add contents of file to ArrayList
         while (scan.hasNext()) {
             fileArray.add(scan.nextLine());
         }
@@ -169,6 +156,41 @@ public class FtpClient {
         outputStream.flush();
 
         scan.close();
+    }
+
+    /**
+     * Downloads a file of the given name into the client_folder
+     *
+     * @param filename String name of file to download
+     * @param inputStream DataInputStream for socket input
+     * @throws IOException
+     */
+    public static void GET(String filename, DataInputStream inputStream) throws IOException {
+
+        // get file name and create new file in client_folder
+        filename = inputStream.readUTF();
+        File f = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
+        FileWriter writer = new FileWriter(f);
+
+        int length = inputStream.readInt();
+
+        // receiving process is different depending on file type
+        if (filename.endsWith(".png")) {
+            // receive .png file
+            byte[] imageAr = new byte[length];
+            inputStream.read(imageAr);
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+            ImageIO.write(image, "png", f);
+
+        } else {
+            // receive .txt file
+            for(int i = 0; i < length; i++) {
+                writer.write(inputStream.readUTF());
+            }
+        }
+        writer.flush();
+
+        writer.close();
     }
 
 }
