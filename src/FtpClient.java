@@ -101,6 +101,7 @@ public class FtpClient {
      * @throws IOException
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
+
         // find file to transmit in client_folder
         File file = new File(Path.of("client_folder").toAbsolutePath() + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
@@ -110,7 +111,7 @@ public class FtpClient {
         ImageIO.write(image, "png", byteArrayOutputStream);
         byte[] imgArray = byteArrayOutputStream.toByteArray();
 
-        // output byte array to client
+        // output byte array to server
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
         outputStream.flush();
@@ -138,7 +139,7 @@ public class FtpClient {
             }
         }
 
-        // scan through entire copy, copy data to String array
+        // scan through entire copy, copy data to String array list
         FileInputStream input = new FileInputStream(copy);
         Scanner scan = new Scanner(input);
         ArrayList<String> fileArray = new ArrayList<String>();

@@ -19,7 +19,6 @@ public class FtpServer {
 
     public static void main(String[] args) {
         try {
-
             // initialize socket
             ServerSocket serverSocket = new ServerSocket(PORT);
             Socket socket = serverSocket.accept();
@@ -29,9 +28,10 @@ public class FtpServer {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
+            // store the current directory
             currentDirectory = getCurrentDirectory();
 
-            // While the client wants the connection to continue, parse the commands
+            // while the client wants the connection to continue, parse the commands
             String command = "";
             while (true) {
                 command = inputStream.readUTF();
@@ -54,39 +54,55 @@ public class FtpServer {
     /**
      * Parses command string to run client's desired command
      *
-     * @param command String containing keyword and possibly parameters from Client
+     * @param command String command from client
+     * @param inputStream DataInputStream for socket input
+     * @param outputStream DataInputStream for socket output
+     * @throws IOException
      */
     public static void parseCommand(String command, DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
+
+        // scan through and parse the client's command
         Scanner commandParser = new Scanner(command);
         ArrayList<String> params = new ArrayList<String>();
         commandParser.useDelimiter(" ");
-
         while (commandParser.hasNext()) {
             params.add(commandParser.next());
         }
 
+        // switch block depending on command
         String keyword = params.get(0);
 
-        if (keyword.equals("LS")) {
-            LS(outputStream);
-        } else if (keyword.equals("PUT")) {
-            PUT(params.get(1), inputStream);
-        } else if (keyword.equals("GET")) {
-            GET(params.get(1), outputStream);
-        } else if (keyword.equals("PWD")) {
-            PWD(outputStream);
-        } else if (keyword.equals("QUIT")){
-            System.exit(0);
+        switch (keyword) {
+            case "LS" :
+                LS(outputStream);
+
+            case "PUT" :
+                PUT(params.get(1), inputStream);
+
+            case "GET" :
+                GET(params.get(1), outputStream);
+
+            case "PWD" :
+                PWD(outputStream);
+
+            case "QUIT" :
+                System.exit(0);
         }
     }
 
     /**
-     * Outputs the files in the current directory to the Client
+     * Outputs the files in the current directory to client
+     *
+     * @param outputStream DataOutputStream for socket output
+     * @throws IOException
      */
     public static void LS(DataOutputStream outputStream) throws IOException{
+        // find all files in current directory
         File[] files = currentDirectory.toFile().listFiles();
 
+        // output number of files in directory
         outputStream.writeInt(files.length);
+
         // output every file name in the array of files under the current directory
         for (int i = 0; i < files.length; i++) {
             outputStream.writeUTF(files[i].getName());
@@ -98,9 +114,13 @@ public class FtpServer {
      *
      * @param filename String name of file to be downloaded
      * @param outputStream OutputStream
+     * @throws IOException
      */
     public static void GET(String filename, DataOutputStream outputStream) throws IOException{
-       outputStream.writeUTF(filename);
+        // output file name
+        outputStream.writeUTF(filename);
+
+        // transmission process depends on file type
         if (filename.endsWith(".png")) {
             // transmit .png file
             transmitPNG(filename, outputStream);
@@ -111,9 +131,15 @@ public class FtpServer {
     }
 
     /**
-     * Receives the file specified by filename from the client
+     * Receives the file specified by filename from client
+     *
+     * @param filename String name of file being uploaded from the client
+     * @param inputStream DataInputStream for socket input
+     * @throws IOException
      */
     public static void PUT(String filename, DataInputStream inputStream) throws IOException {
+
+        // create new file in server_folder
         filename = inputStream.readUTF();
         File f = new File(Path.of("server_folder").toAbsolutePath() + File.separator + filename);
         FileWriter writer= new FileWriter(f);
@@ -136,12 +162,14 @@ public class FtpServer {
         }
         writer.flush();
 
-
         writer.close();
     }
 
     /**
-     * Lists the current directory, using path stored in currentDirectory
+     * Outputs the current directory, using path stored in currentDirectory
+     *
+     * @param outputStream DataOutputStream for socket output
+     * @throws IOException
      */
     public static void PWD(DataOutputStream outputStream) throws IOException {
         outputStream.writeUTF(currentDirectory.toString());
@@ -151,14 +179,21 @@ public class FtpServer {
      * Transmits a file of type .png to client
      *
      * @param filename the name of the png file to be transmitted
+     * @param outputStream DataOutputStream for socket output]
+     * @throws IOException
      */
     public static void transmitPNG(String filename, DataOutputStream outputStream) throws IOException{
+
+        // finds file to be sent in server_folder
         File file = new File(currentDirectory + File.separator + filename);
         BufferedImage image = ImageIO.read(file);
 
+        // write .png file to byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(image, "png", byteArrayOutputStream);
         byte[] imgArray = byteArrayOutputStream.toByteArray();
+
+        // output byte array with image to client
         outputStream.writeInt(imgArray.length);
         outputStream.write(imgArray);
         outputStream.flush();
@@ -170,24 +205,25 @@ public class FtpServer {
      * Transmits a file of type .txt to client
      *
      * @param filename the name of the png file to be transmitted
+     * @param outputStream DataOutputStream for socket output
+     * @throws IOException
      */
     public static void transmitTXT(String filename, DataOutputStream outputStream) throws IOException{
+        // find file to transmit from server_folder
         File[] files = currentDirectory.toFile().listFiles();
 
+        // copy the .txt file to be sent
         File copy = new File(filename);
-
         for (int i = 0; i < files.length; i++) {
             if (files[i].getName().equals(filename)) {
                  copy = files[i];
             }
         }
 
+        // scan through entire copy, copy data to ArrayList of Strings
         FileInputStream input = new FileInputStream(copy);
-
         Scanner scan = new Scanner(input);
-
         ArrayList<String> fileArray = new ArrayList<String>();
-        // add contents of file to ArrayList
         while (scan.hasNext()) {
             fileArray.add(scan.nextLine());
         }
